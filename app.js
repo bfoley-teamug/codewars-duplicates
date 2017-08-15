@@ -9,7 +9,7 @@
 function duplicateCount (str) { 
  const dict = {};
   
- const strArr = str.split('');
+ const strArr = str.toUpperCase().split(''); 
   
  let total = 0;
   
