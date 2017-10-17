@@ -1,32 +1,43 @@
-//codewars "counting duplicates"
+ 
+const myMap = L.map('map');
+ 
+const myBasemap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+});
+ 
+myBasemap.addTo(myMap);
+ 
+myMap.setView([37.5222722, -122.3224665], 14);
 
-//Count the number of Duplicates
-//
-//Write a function that will return the count of distinct case-insensitive alphabetic characters and numeric digits that occur more than once in the input string. The input string can be assumed to contain only alphabets (both uppercase and lowercase) and numeric digits.
 
-//www.codewars.com/kata/54bf1c2cd5b56cc47f0007a1/train/javascript
+const request = new XMLHttpRequest();
 
-function duplicateCount (str) { 
- const dict = {};
+request.open('GET', 'parks.json', true);
+
+request.onload = function() {
   
- const strArr = str.toUpperCase().split(''); 
+    const data = JSON.parse(this.response);
   
- let total = 0;
+    const parkCount = data.parks.reduce((sums, park) => {
+      sums[park.city] = (sums[park.city] || 0) + 1;
+      return sums;
+    }, {});
   
- strArr.forEach(char => {
-   if(!dict[char]) {
-    dict[char] = 0;
- }
-  dict[char]++;
- });
+    console.log(parkCount); 
   
- Object.keys(dict).forEach(key => {
-   if(dict[key] > 1) {
-     total++;
-   }
- });
-  
-  return total;
-}
-  
-console.log(duplicateCount("mississippi"));
+    for (let city in parkCount) {
+      console.log(city, parkCount[city])
+    }
+
+    const parks = data.parks.map(function(park) {
+
+    L.marker([park.lat, park.long]).bindPopup(`
+      <h4>${park.name}</h4> 
+      <p>${park.city}</p>
+  `).openPopup().addTo(myMap);
+    });
+  }  
+
+
+request.send(); 
